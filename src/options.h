@@ -26,6 +26,7 @@ extern bool fPrintWLD;
 extern bool fPrintMPCStats;
 extern bool fCompareMode;
 extern bool fTourmanent;
+extern bool fGTPMode;
 
 extern int treeNEmpty;
 

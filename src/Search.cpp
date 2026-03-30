@@ -11,6 +11,7 @@
 #include "TreeDebug.h"
 #include "Search.h"
 #include "Evaluator.h"
+#include "options.h"
 
 // book search depths
 const int kBookReadDepth=6;	// maximum depth to read from book
@@ -702,7 +703,7 @@ void ValueMulti(Pos2& pos2, int height, CValue alpha, CValue beta, int iPrune, u
 				// print if the move's value is >=alpha (means we have a reasonable value for it)
 				// or if it's one of the first nBest moves (means it's a WLD round and we have a WLD value)
 				if (vChild>vSearchAlpha || i<mvs.begin()+nBest) {
-					OutputSearchInfo(std::cout, mv, fPassBefore, CHeightInfoX(height, iPrune, fWld, pos2.NEmpty()));
+					OutputSearchInfo(fGTPMode ? std::cerr : std::cout, mv, fPassBefore, CHeightInfoX(height, iPrune, fWld, pos2.NEmpty()));
 				}
 			}
 			if (vChild>vSearchAlpha) {
@@ -792,7 +793,7 @@ void IterativeValue(Pos2& pos2, CMoves moves, const CCalcParams& cp,
 
 	// print MPC stat static value?
 	if (si.NeedMPCStats())
-		std::cout << "\t" << StaticValue(pos2, 0);
+		(fGTPMode ? std::cerr : std::cout) << "\t" << StaticValue(pos2, 0);
 
 	// initialize cache and book read height
 	InitializeCache();
@@ -857,9 +858,9 @@ void IterativeValue(Pos2& pos2, CMoves moves, const CCalcParams& cp,
 		if (!abortRound)
 			mvk.hiFull=hi;
 
-		// special checks when calculating mpc stats
-		if (si.NeedMPCStats())
-			printf("\t%d",mvk.value);
+	// special checks when calculating mpc stats
+	if (si.NeedMPCStats())
+		fprintf(fGTPMode ? stderr : stdout, "\t%d",mvk.value);
 
 		// are we done?
 		// don't stop on wipeouts, we could have had an MPC cutoff
@@ -887,20 +888,21 @@ void IterativeValue(Pos2& pos2, CMoves moves, const CCalcParams& cp,
 		book->StoreIterativeResult(pos2.GetBB(), nBest, nEvalOld,nEvalNew,mvsOld,mvsNew,mvk, fFull, fStoreUnsolved);
 	}
 	if (si.PrintMoveSearchStats()) {
+		std::ostream& os = fGTPMode ? std::cerr : std::cout;
 		u4 i;
 		if (nEvalNew) {
-			std::cout << mvk.hiBest << " (" << pos2.NEmpty() << " empty)\t";
+			os << mvk.hiBest << " (" << pos2.NEmpty() << " empty)\t";
 			for (i=0; i<nEvalNew; i++) {
-				std::cout << mvsNew[i] << "\t";
+				os << mvsNew[i] << "\t";
 			}
 		}
 		if (abortRound) {
-			std::cout << mvk.hiFull << " (" << pos2.NEmpty() << " empty)\t";
+			os << mvk.hiFull << " (" << pos2.NEmpty() << " empty)\t";
 			for (i=0; i<nEvalOld; i++) {
-				std::cout << mvsOld[i] << "\t";
+				os << mvsOld[i] << "\t";
 			}
 		}
-		std::cout << "\t" << tElapsed << "s elapsed\n";
+		os << "\t" << tElapsed << "s elapsed\n";
 	}
 
 	// calc timing info
@@ -1068,12 +1070,12 @@ void TimedMVK(Pos2& pos2, const CCalcParams& cp, const CSearchInfo& si, CMVK& mv
 		else {
 			// value the move
 			if (si.PrintAnalysis())
-				std::cout << (si.PrintPondering()?"status Analyzing":"status Thinking") << std::endl;
+				std::cerr << (si.PrintPondering()?"status Analyzing":"status Thinking") << std::endl;
 			IterativeValue(pos2, moves, cp, si, mvk, fPassBefore, 1);		
 			assert(mvk.move.Valid());
 			fIterativeNS=true;
 			if (si.PrintAnalysis())
-				std::cout << "status" << std::endl;
+				std::cerr << "status" << std::endl;
 		}
 	}
 

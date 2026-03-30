@@ -285,10 +285,11 @@ int main(int argc, char**argv, char**envp) {
     	CDrawTreeLimits drawTreeLimits;
     	ReadParameters(cd1,cd2, drawTreeLimits);
     	const TMode mode=ParseCommandLine(argc, argv, submode, cd1, nGames);
+    	fGTPMode = mode==kGTP;
 
     	if (mode != kGTP) {
-    		cout << "Ntest version as of " << __DATE__ << "\n";
-    		cout << "Copyright 1999-2014 Chris Welty and Vlad Petric\nAll Rights Reserved\n\n";
+    		cerr << "Ntest version as of " << __DATE__ << "\n";
+    		cerr << "Copyright 1999-2014 Chris Welty and Vlad Petric\nAll Rights Reserved\n\n";
 
     		Test();
     	}
@@ -543,9 +544,9 @@ int main(int argc, char**argv, char**envp) {
     	//PrintBookReadData();
     	if (mode != kGTP) {
     		time(&end_time);
-    		printf("\n\nRun completed at GMT %s\n",asctime(gmtime(&end_time)));
+    		fprintf(stderr, "\n\nRun completed at GMT %s\n",asctime(gmtime(&end_time)));
     		end.Read();
-    		cout << (end-start) << "\n";
+    		cerr << (end-start) << "\n";
     	}
 
     	Clean();
@@ -557,7 +558,7 @@ int main(int argc, char**argv, char**envp) {
 
     	return 0;
     } catch(std::string exception) {
-    	cout << exception << "\n";
+    	cerr << exception << "\n";
     	return -1;
     }
 }

@@ -17,6 +17,7 @@
 #include "Evaluator.h"
 
 #include "PlayerComputer.h"
+#include "options.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ CPlayerComputer::CPlayerComputer(const CComputerDefaults& acd) {
 
 	caches[0]=caches[1]=NULL;
 	fHasCachedPos[0]=fHasCachedPos[1]=false;
-	std::cout << "status Loading book" << std::endl;
+	std::cerr << "status Loading book" << std::endl;
 	book=(cd.booklevel!=CComputerDefaults::kNoBook) ? CSmartBook::FindBook(cd.cEval, cd.cCoeffSet, pcp) : NULL;
 	eval=CEvaluator::FindEvaluator(cd.cEval, cd.cCoeffSet);
 	mpcs=CMPCStats::GetMPCStats(cd.cEval, cd.cCoeffSet, std::max(cd.iPruneMidgame, cd.iPruneEndgame));
@@ -118,9 +119,9 @@ CPlayerComputer::CPlayerComputer(const CComputerDefaults& acd) {
 		cd.iPruneMidgame=cd.iPruneEndgame=0;
 
 
-	std::cout << "status Negamaxing book" << std::endl;
+	std::cerr << "status Negamaxing book" << std::endl;
 	SetupBook(cd.booklevel==CComputerDefaults::kNegamaxBook);
-	std::cout << "status" << std::endl;
+	std::cerr << "status" << std::endl;
 }
 
 CPlayerComputer::~CPlayerComputer() {
@@ -307,10 +308,11 @@ void CPlayerComputer::GetChosen(const CSearchInfo& si, const CQPosition& pos, CM
 
 	// Print the move
 	if (si.PrintMove()) {
-		cout << (si.PrintPondering()?"Predict: ":"=== ")
-			<< mvk
-			<< setw(3) << pos.NEmpty() << "e: "
-			<< (si.PrintPondering()?"":" ===") << "\n";
+		ostream& os = fGTPMode ? cerr : cout;
+		os << (si.PrintPondering()?"Predict: ":"=== ")
+		   << mvk
+		   << setw(3) << pos.NEmpty() << "e: "
+		   << (si.PrintPondering()?"":" ===") << "\n";
 	}
 }
 
@@ -405,7 +407,7 @@ bool CPlayerComputer::AnalyzeGame(const COsGame& game) {
 		cerr << "a";
 		if (!book->IsInBook(game)) {
 			fAdded=true;
-			std::cout << "\nstatus Learning " << game.pis[1].sName << "/" << game.pis[0].sName << std::endl;
+			std::cerr << "\nstatus Learning " << game.pis[1].sName << "/" << game.pis[0].sName << std::endl;
 			Backtrack(game);
 		}
 		if (cd.fsPrint&CSearchInfo::kPrintGameAnalysis)
@@ -423,7 +425,7 @@ void CPlayerComputer::Backtrack(const COsGame& game) {
 		book->SetComputer(this);
 		book->CorrectGame(game, game.sPlace!="Local", nSearches, cd.iEdmund);
 		if (fPrintCorrections)
-			cout << "Done correcting game. " << nSearches << " searches done.\n";
+			cerr << "Done correcting game. " << nSearches << " searches done.\n";
 	}
 }
 
@@ -443,34 +445,34 @@ void CPlayerComputer::PrintAnalysis(const COsGame& game) {
 	start.Read();
 	nMoves = static_cast<int>(game.ml.size());
 
-	cout << "----------- Analyzing Game -----------\n";
+	cerr << "----------- Analyzing Game -----------\n";
 	for (iMove=0; iMove<nMoves; iMove++) {
 		CMove mv(game.ml[iMove].mv);
 		if (pos.NEmpty()<=hSolverStart)
 			break;
 		Pos2 pos2;
 		pos2.Initialize(pos.BitBoard(),pos.BlackMove());
-		cout << "--------- move " << iMove+1 << "--------------\n";
+		cerr << "--------- move " << iMove+1 << "--------------\n";
 		pos2.Print();
 		if (pos.NEmpty()<60 && pos.CalcMoves(moves)) {
 			const CBookData* bd=book->FindData(pos.BitBoard());
 			if (!bd) {
-				cout << "Position not in book\n";
+				cerr << "Position not in book\n";
 				assert(0);
 			}
 			else  {
-				cout << *bd << "\n";
+				cerr << *bd << "\n";
 				book->GetAndPrintSubnodes(pos, 0, -1);
-				cout << "\n";
+				cerr << "\n";
 			}
 		}
-		cout << game.pis[pos.BlackMove()].sName << " played: " << mv << "\n";
+		cerr << game.pis[pos.BlackMove()].sName << " played: " << mv << "\n";
 		pos.MakeMove(mv);
 	}
 
 	// more debug info
 	end.Read();
-	printf("Analysis complete in %.3lg seconds\n",(end-start).Seconds());
+	fprintf(stderr, "Analysis complete in %.3lg seconds\n",(end-start).Seconds());
 }
 
 void CPlayerComputer::SetParameters(const CQPosition& pos, bool fUseBook, int iCache) {
@@ -483,7 +485,7 @@ void CPlayerComputer::SetParameters(const CQPosition& pos, bool fUseBook, int iC
 	fHasCachedPos[iCache]=true;
 	if (caches[!iCache] && fHasCachedPos[!iCache] && posCached[!iCache].IsSuccessor(pos)) {
 		caches[iCache]->CopyData(*(caches[!iCache]));
-		cout << "Cache copy!\n";
+		cerr << "Cache copy!\n";
 	}
 
 	prepareCache();

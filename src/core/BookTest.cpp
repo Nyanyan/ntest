@@ -28,7 +28,7 @@ void CBook::TestMyIO(std::vector<char>* contents) {
 		if (*contents != bytes) {
 			fail("file was not stored correctly");
 		} else {
-			std::cout << "file was stored correctly\n";
+			fprintf(stderr, "file was stored correctly\n");
 		}
 	}
 	TEST(*this==book2);

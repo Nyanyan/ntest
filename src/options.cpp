@@ -24,6 +24,7 @@ bool fPrintTree=false;
 bool fPrintWLD=false;
 bool fCompareMode=false;
 bool fInTournament=false;
+bool fGTPMode=false;
 
 //Captured positions
 FILE* cpFile;

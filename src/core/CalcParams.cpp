@@ -195,11 +195,11 @@ void CCalcParamsStandard::CalcHeights() {
 
     extern int nSolvePct[6];
 
-    cout << "---- Heights ----\n";
-    cout << "midgame : " << hMidgame << "\n";
+    cerr << "---- Heights ----\n";
+    cerr << "midgame : " << hMidgame << "\n";
     for (i=0; i<=5; i++)
-    	cout << setw(3) << nSolvePct[i] << "% WLD: " << hWLD[i] << "\n";
-    cout << "\n";
+    	cerr << setw(3) << nSolvePct[i] << "% WLD: " << hWLD[i] << "\n";
+    cerr << "\n";
 }
 
 int CCalcParamsStandard::LogCacheSize(int aPrune) const {

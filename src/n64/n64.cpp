@@ -10,7 +10,7 @@
 
 void printCompileType() {
 #ifdef _M_AMD64
-	std::cout << "64-bit compile\n";
+	fprintf(stderr, "64-bit compile\n");
 #else
 	std::cout << "32-bit compile\n";
 #endif
