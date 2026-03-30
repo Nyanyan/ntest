@@ -214,7 +214,7 @@ void CCacheData::Print(bool blackMove) const {
 /////////////////////////////////////////////////
 
 CCache::CCache(u4 anbuckets) {
-    fprintf(stderr, "Creating cache with %d buckets (%lu MB)\n",anbuckets, anbuckets*sizeof(CCacheData)>>20);
+    fprintf(stderr, "Creating cache with %d buckets (%zu MB)\n",anbuckets, static_cast<size_t>(anbuckets)*sizeof(CCacheData)>>20);
     nBuckets=anbuckets;
     mask=nBuckets-1;
     buckets=new CCacheData[nBuckets];

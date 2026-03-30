@@ -31,6 +31,7 @@
 #include "options.h"
 #include "GameX.h"
 #include "Evaluator.h"
+#include "PlayerComputer.h"
 #include "EvalTest.h"
 #include "SpeedTest.h"
 #include "TreeDebug.h"

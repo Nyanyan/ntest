@@ -1,3 +1,5 @@
+#pragma once
+
 #include "core/QPosition.h"
 #include "core/SearchInfo.h"
 #include "core/MVK.h"

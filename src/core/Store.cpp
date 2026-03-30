@@ -17,12 +17,12 @@ FileIo::FileIo(const std::string& path, bool forReading) : m_path(path) {
 
 FileIo::~FileIo() {
 	if (fp==NULL) {
-		throw IOException("File is not open", "", -1);
+		return;
 	}
-	int result = fclose(fp);
+	const int result = fclose(fp);
 	fp=NULL;
 	if (result!=0) {
-		throw IOException("Error closing the file", "", result);
+		fprintf(stderr, "Error closing file '%s' (errno=%d)\n", m_path.c_str(), result);
 	}
 }
 
@@ -67,17 +67,17 @@ FileWriter::~FileWriter() {
 			case ERROR_WRITE_PROTECT:
 				os << "Disk is write protected";
 				break;
-			default:
-				os << "error code = " << err;
+		default:
+			os << "error code = " << err;
 		}
 		os << "\n";
-		throw IOException(os.str(), m_permanentPath, err);
+		fputs(os.str().c_str(), stderr);
     }
 #else
 	if (rename(m_tempPath.c_str(), m_permanentPath.c_str()) != 0) {
 		std::ostringstream os;
 		os << "WARNING: Can't save book file " << m_permanentPath << ' ' << strerror(errno) << std::endl;
-		throw IOException(os.str(), m_permanentPath, errno);
+		fputs(os.str().c_str(), stderr);
 	}
 #endif
 }

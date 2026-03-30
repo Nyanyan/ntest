@@ -55,7 +55,7 @@ void RandomGameEvalGen() {
                 // Evaluate the position, print the config, then break. 
                 Pos2 pp;
                 pp.Initialize(bb, blackMove);
-                CValue val = eval->EvalMobs(pp, bitCount(moveBits), bitCount(enemyMoveBits));
+                CValue val = eval->EvalMobs(pp, static_cast<u4>(bitCount(moveBits)), static_cast<u4>(bitCount(enemyMoveBits)));
                 fprintf(stdout, "{0x%" PRIx64 ", 0x%" PRIx64 ", %s, %d} /* %d moves */", bb.mover, bb.empty, blackMove? "true": "false", static_cast<int>(val), stopAt);
                 break;
             }
