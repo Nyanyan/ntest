@@ -38,6 +38,7 @@
 #include "Search.h"
 #include "NtestStream.h"
 #include "MPCCalc.h"
+#include "Gtp.h"
 
 #include "Pos2Test.h"
 #include "SearchTest.h"
@@ -54,7 +55,7 @@ enum TMode { kSpeedTest, kCalcMPC, kPosValues, kGetStartPos,
     			kAnalyze,
     			kGame, kGGS,
     			kCompare, kExternalViewer, kNukeBook, kDrawTree,
-    			kTestOnly };
+    			kTestOnly, kGTP };
 
 TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     				  CComputerDefaults& cd, int& nGames);
@@ -269,9 +270,6 @@ int main(int argc, char**argv, char**envp) {
     	int nGames;
     	const char* submode;
 
-    	cout << "Ntest version as of " << __DATE__ << "\n";
-    	cout << "Copyright 1999-2014 Chris Welty and Vlad Petric\nAll Rights Reserved\n\n";
-
     	//_crtBreakAlloc=329;
 
     	////////////////////////////////////////
@@ -280,12 +278,17 @@ int main(int argc, char**argv, char**envp) {
 
     	Init();
 
-    	Test();
-
     	CComputerDefaults cd1, cd2;
     	CDrawTreeLimits drawTreeLimits;
     	ReadParameters(cd1,cd2, drawTreeLimits);
     	const TMode mode=ParseCommandLine(argc, argv, submode, cd1, nGames);
+
+    	if (mode != kGTP) {
+    		cout << "Ntest version as of " << __DATE__ << "\n";
+    		cout << "Copyright 1999-2014 Chris Welty and Vlad Petric\nAll Rights Reserved\n\n";
+
+    		Test();
+    	}
 
     	CNodeStats start, end;
 
@@ -522,6 +525,10 @@ int main(int argc, char**argv, char**envp) {
     			CGameX gamex(cd1);
     			break;
     							  }
+    		case kGTP: {
+    			RunGtp(cd1);
+    			break;
+    				   }
     		default:
     			cerr << "that mode is not currently supported\n";
     			cout << "that mode is not currently supported\n";
@@ -531,10 +538,12 @@ int main(int argc, char**argv, char**envp) {
     	}
 
     	//PrintBookReadData();
-    	time(&end_time);
-    	printf("\n\nRun completed at GMT %s\n",asctime(gmtime(&end_time)));
-    	end.Read();
-    	cout << (end-start) << "\n";
+    	if (mode != kGTP) {
+    		time(&end_time);
+    		printf("\n\nRun completed at GMT %s\n",asctime(gmtime(&end_time)));
+    		end.Read();
+    		cout << (end-start) << "\n";
+    	}
 
     	Clean();
 
@@ -563,6 +572,9 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
 
     // overrides by command line
     if (argc>1) {
+    	if (!strcmp(argv[1], "--gtp")) {
+    		return kGTP;
+    	}
     	submode=argv[1];
     	switch(*(submode++)) {
     	case 'a': mode=kAnalyze; break;
