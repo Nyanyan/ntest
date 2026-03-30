@@ -2,6 +2,12 @@
 #include <cassert>
 #include <cstring>
 #include <string>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <limits.h>
+#include <unistd.h>
+#endif
 
 const static char* header = "  7 6 5 4 3 2 1 0\n";
 
@@ -511,4 +517,26 @@ int TextToValue(char c) {
     }
 }
 
-std::string fnBaseDir("./");
+static std::string GetExecutableDir() {
+#ifdef _WIN32
+    char path[MAX_PATH];
+    const DWORD len=GetModuleFileNameA(NULL, path, MAX_PATH);
+    if (len==0 || len>=MAX_PATH)
+    	return "./";
+#else
+    char path[PATH_MAX];
+    const ssize_t len=readlink("/proc/self/exe", path, sizeof(path)-1);
+    if (len<=0 || len>=static_cast<ssize_t>(sizeof(path)))
+    	return "./";
+    path[len]=0;
+#endif
+
+    std::string result(path);
+    const std::string::size_type pos=result.find_last_of("\\/");
+    if (pos==std::string::npos)
+    	return "./";
+    result.erase(pos+1);
+    return result;
+}
+
+std::string fnBaseDir(GetExecutableDir());
