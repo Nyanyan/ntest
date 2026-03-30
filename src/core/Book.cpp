@@ -12,6 +12,7 @@
 #include <sstream>
 #include <iomanip>
 #include "../odk/OsObjects.h"
+#include "../options.h"
 
 #include "Moves.h"
 #include "QPosition.h"
@@ -20,6 +21,12 @@
 #include "Store.h"
 
 using namespace std;
+
+namespace {
+std::ostream& BookInfoStream() {
+	return fGTPMode ? std::cerr : std::cout;
+}
+}
 
 ////////////////////////////////////////////////////////////
 // CBookValue
@@ -1051,7 +1058,7 @@ static void PickRandomMove(vector<CMVPS>& mvs, int randomShift, CMoveValue& chos
     }
 
     if (fPrintRandomInfo)
-    	cout << "\nChoosing move " << i+1 << "/" << nChoices << " - " << mvs[i] << "\n";
+    	BookInfoStream() << "\nChoosing move " << i+1 << "/" << nChoices << " - " << mvs[i] << "\n";
 
     chosen = mvs[i];
 }
@@ -1282,8 +1289,9 @@ bool CBook::GetRandomMove(const CQPosition& pos, const CSearchInfo& si, CMVK& mv
     }
 
     if (fPrintLevel) {
-    	cout << "BOOK: " << *bd << "\n";
-    	cout << "Contempt: " << si.vContempt << "; Randomness: " << si.rs << "\n";
+    	std::ostream& os = BookInfoStream();
+    	os << "BOOK: " << *bd << "\n";
+    	os << "Contempt: " << si.vContempt << "; Randomness: " << si.rs << "\n";
     }
 
     // check for error condition and return false if we have one
@@ -1298,7 +1306,7 @@ bool CBook::GetRandomMove(const CQPosition& pos, const CSearchInfo& si, CMVK& mv
 
     // no error condition.
     if (fPassBefore) {
-    	std::cout << "book PA 0 0 0 0\n";
+    	BookInfoStream() << "book PA 0 0 0 0\n";
     	mvk.move.Set(-1);
     	mvk.value=0;
     	mvk.fKnown=0;
@@ -1820,7 +1828,7 @@ void CBook::StoreIterativeResult(const CBitBoard& bb, int nBest, int nEvalOld,in
     	assert(mvk.hiFull.Valid());
     	if (fWLDSolved) {
     		// solved root node
-    		std::cout << "AddToBook mode - solved node" << std::endl;
+    		BookInfoStream() << "AddToBook mode - solved node" << std::endl;
     		if (fFull)
     			StoreLeaf(bb,CHeightInfoX(mvk.hiFull, nEmpty),value);
 
