@@ -73,6 +73,7 @@ CCalcParams* CCalcParams::NewFromString(const string& sCalcParams) {
     	case 'f': pcp=new CCalcParamsFixedHeight(CHeightInfo(nMinutesOrDepth,4,false)); break;
     	case 's': pcp=new CCalcParamsStandard(nMinutesOrDepth); break;
     	case 't': pcp=new CCalcParamsTurbo(nMinutesOrDepth); break;
+    	case 'l': pcp=new CCalcParamsEdaxLevel(nMinutesOrDepth); break;
     	case 'm': pcp=new CCalcParamsMatchTime(); tMatch=60*nMinutesOrDepth; break;
     	case 'a':
     		nEmptyMinSolve=0;
@@ -248,6 +249,37 @@ void CCalcParamsTurbo::Name(ostream& os) const {
 
 int CCalcParamsTurbo::Strength() const {
     return hMidgame+4;
+}
+
+//////////////////////////////////////
+// CCalcParamsEdaxLevel
+//////////////////////////////////////
+
+CCalcParamsEdaxLevel::CCalcParamsEdaxLevel(int aLevel) {
+    level=aLevel;
+}
+
+int CCalcParamsEdaxLevel::LogCacheSize(int aPrune) const {
+    return 7+(level*3)/2;
+}
+
+void CCalcParamsEdaxLevel::Out(ostream& os) const {
+    os << "l" << level;
+}
+
+void CCalcParamsEdaxLevel::Name(ostream& os) const {
+    os << "edax" << level;
+}
+
+CHeightInfo CCalcParamsEdaxLevel::MinHeight(int nEmpty) const {
+    if (nEmpty<=2*level)
+    	return CHeightInfo(nEmpty-hSolverStart, 0, false, nEmpty);
+    else
+    	return CHeightInfo(level, 0, false, nEmpty);
+}
+
+int CCalcParamsEdaxLevel::Strength() const {
+    return level;
 }
 
 

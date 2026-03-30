@@ -301,7 +301,7 @@ int main(int argc, char**argv, char**envp) {
 
     	if (mode==kSpeedTest) {
     		PrintStuff(false);
-    		TestMoveSpeed(cd1.MinutesOrDepth(), nGames, argv[1]+1);
+    		TestMoveSpeed(cd1.MinutesOrDepth(), nGames, const_cast<char*>(submode));
     	}
 
     	///////////////////////////////////////////
@@ -570,13 +570,32 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     TMode mode=kExternalViewer;
     submode="\0";
     nGames=1;
+    int argBase=1;
+    bool fEdaxLevel=false;
+
+    if (argc>2 && !strcmp(argv[argBase], "-l")) {
+    	const int level=atoi(argv[argBase+1]);
+    	if (level<=0) {
+    		cerr << "The -l option requires a positive level.\n";
+    		cout << "The -l option requires a positive level.\n";
+    		_exit(1);
+    	}
+
+    	std::ostringstream os;
+    	os << 'l' << level;
+    	cd.sCalcParams=os.str();
+    	cd.iPruneMidgame=0;
+    	cd.iPruneEndgame=0;
+    	fEdaxLevel=true;
+    	argBase+=2;
+    }
 
     // overrides by command line
-    if (argc>1) {
-    	if (!strcmp(argv[1], "--gtp")) {
+    if (argc>argBase) {
+    	if (!strcmp(argv[argBase], "--gtp")) {
     		return kGTP;
     	}
-    	submode=argv[1];
+    	submode=argv[argBase];
     	switch(*(submode++)) {
     	case 'a': mode=kAnalyze; break;
     	case 'c': mode=kCompare; break;
@@ -596,31 +615,34 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     	case 'o': mode=kTestOnly; break;
 
     	default:
-    		cerr << "unknown or dangerous mode '" << argv[1] << "'\n";
-    		cout << "unknown or dangerous mode '" << argv[1] << "'\n";
+    		cerr << "unknown or dangerous mode '" << argv[argBase] << "'\n";
+    		cout << "unknown or dangerous mode '" << argv[argBase] << "'\n";
     		_exit(1);
     	}
+    	argBase++;
     }
 
     // argument 2 : time control
     double tMatch=defaultMatchMinutes*60;
 
-    if (argc>2) {
-    	cd.sCalcParams=argv[2];
+    if (!fEdaxLevel && argc>argBase) {
+    	cd.sCalcParams=argv[argBase];
+    	argBase++;
     }
 
     // argument 3 : number of games in a series
-    if (argc>3) {
-    	int nGamesTemp=atol(argv[3]);
+    if (argc>argBase) {
+    	int nGamesTemp=atol(argv[argBase]);
     	if (nGamesTemp>0)
     		nGames=nGamesTemp;
     	else
     		fprintf(stderr, "The third argument (number of games) must be greater than 0!\n");
+    	argBase++;
     }
 
     // argument 4: opening file name
-    if (argc>4) {
-    	fnOpening=fnBaseDir+argv[4];
+    if (argc>argBase) {
+    	fnOpening=fnBaseDir+argv[argBase];
     }
 
     return mode;

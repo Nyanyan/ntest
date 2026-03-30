@@ -103,6 +103,20 @@ public:
     int Strength() const;
 };
 
+class CCalcParamsEdaxLevel: public CCalcParams {
+public:
+    CCalcParamsEdaxLevel(int level);
+
+    virtual int LogCacheSize(int aPrune) const;
+    virtual void Out(std::ostream& os) const;
+    virtual void Name(std::ostream& os) const;
+    virtual CHeightInfo MinHeight(int nEmpty) const;
+    virtual int Strength() const;
+
+private:
+    int level;
+};
+
 class CCalcParamsAverageTime: public CCalcParams {
 public:
     CCalcParamsAverageTime(double tAverage);
