@@ -30,4 +30,5 @@ FILE* cpFile;
 int nCapturedPositions=0;
 
 int hNegascout=6;
+int nMaxThreads=0;
 

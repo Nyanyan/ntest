@@ -42,5 +42,6 @@ extern int nCapturedPositions;
 
 // search params
 extern int hNegascout;
+extern int nMaxThreads;
 
 #endif // H_OPTIONS

@@ -573,21 +573,45 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     int argBase=1;
     bool fEdaxLevel=false;
 
-    if (argc>2 && !strcmp(argv[argBase], "-l")) {
-    	const int level=atoi(argv[argBase+1]);
-    	if (level<=0) {
-    		cerr << "The -l option requires a positive level.\n";
-    		cout << "The -l option requires a positive level.\n";
-    		_exit(1);
-    	}
+    while (argc>argBase && argv[argBase][0]=='-' && strcmp(argv[argBase], "--gtp")) {
+    	if (!strcmp(argv[argBase], "-l")) {
+    		if (argc<=argBase+1) {
+    			cerr << "The -l option requires a positive level.\n";
+    			cout << "The -l option requires a positive level.\n";
+    			_exit(1);
+    		}
+    		const int level=atoi(argv[argBase+1]);
+    		if (level<=0) {
+    			cerr << "The -l option requires a positive level.\n";
+    			cout << "The -l option requires a positive level.\n";
+    			_exit(1);
+    		}
 
-    	std::ostringstream os;
-    	os << 'l' << level;
-    	cd.sCalcParams=os.str();
-    	cd.iPruneMidgame=0;
-    	cd.iPruneEndgame=0;
-    	fEdaxLevel=true;
-    	argBase+=2;
+    		std::ostringstream os;
+    		os << 'l' << level;
+    		cd.sCalcParams=os.str();
+    		cd.iPruneMidgame=0;
+    		cd.iPruneEndgame=0;
+    		fEdaxLevel=true;
+    		argBase+=2;
+    	}
+    	else if (!strcmp(argv[argBase], "-t")) {
+    		if (argc<=argBase+1) {
+    			cerr << "The -t option requires a positive thread count.\n";
+    			cout << "The -t option requires a positive thread count.\n";
+    			_exit(1);
+    		}
+    		nMaxThreads=atoi(argv[argBase+1]);
+    		if (nMaxThreads<=0) {
+    			cerr << "The -t option requires a positive thread count.\n";
+    			cout << "The -t option requires a positive thread count.\n";
+    			_exit(1);
+    		}
+    		argBase+=2;
+    	}
+    	else {
+    		break;
+    	}
     }
 
     // overrides by command line

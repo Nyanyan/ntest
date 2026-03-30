@@ -10,6 +10,7 @@
 
 #include "SmartBook.h"
 #include "GameX.h"
+#include "options.h"
 
 ///////////////////////////////////
 // CGame2
@@ -107,11 +108,15 @@ CGameX::CGameX(CComputerDefaults cd) {
     // Initialize with a basic board. That way we're guaranteed to always have a legal game.
     Initialize("8");
 
-    // start up the thread that will give us messages
-    std::thread cinthread(MoveCinToDeque);
+    const bool fUseCinThread=nMaxThreads!=1;
+    std::thread cinthread;
+    if (fUseCinThread) {
+    	cinthread=std::thread(MoveCinToDeque);
+    	cinthread.detach();
+    }
 
     std::string sLine;
-    while (GetLineFromThread(sLine)) {
+    while (fUseCinThread?GetLineFromThread(sLine):static_cast<bool>(std::getline(std::cin, sLine))) {
     	// save value of GameOver so that we know whether to learn the game
     	const bool fGameWasOver=GameOver();
 
