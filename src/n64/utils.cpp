@@ -540,3 +540,11 @@ static std::string GetExecutableDir() {
 }
 
 std::string fnBaseDir(GetExecutableDir());
+
+void SetCurrentDirectoryToBaseDir() {
+#ifdef _WIN32
+    SetCurrentDirectoryA(fnBaseDir.c_str());
+#else
+    chdir(fnBaseDir.c_str());
+#endif
+}

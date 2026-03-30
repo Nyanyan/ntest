@@ -193,6 +193,7 @@ public:
 static std::vector<SolveTest> getSolverTests(int depth, bool withResults) {
 	std::vector<SolveTest> tests;
 	std::ostringstream os;
+	os << fnBaseDir;
 	if (withResults) {
 		os << "resource/solver" << depth << ".txt";
 	}

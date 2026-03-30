@@ -228,7 +228,7 @@ void Compare(CPlayerComputer& computer1, CPlayerComputer& computer2) {
 
     nWins=nDraws=nLosses=0;
 
-    fp=fopen("CompareStart.pos","rb");
+    fp=fopen((fnBaseDir+"CompareStart.pos").c_str(),"rb");
     assert(fp);
     if (fp) {
     	while (fread(&bb,sizeof(bb),1,fp)) {
@@ -261,6 +261,8 @@ void Compare(CPlayerComputer& computer1, CPlayerComputer& computer2) {
 }
 
 int main(int argc, char**argv, char**envp) {
+    SetCurrentDirectoryToBaseDir();
+
     if (argc>1 && !strcmp(argv[1], "n64")) {
     	extern int n64_main(int argc, char* argv[]);
     	return n64_main(argc-1, argv+1);
@@ -490,7 +492,7 @@ int main(int argc, char**argv, char**envp) {
     			}
     		case kGetStartPos: {
     			/*
-    			FILE* fp=fopen("CompareStart.pos","wb");
+    			FILE* fp=fopen((fnBaseDir+"CompareStart.pos").c_str(),"wb");
     			assert(fp);
     			if (fp) {
     				int nAcceptable, nEmpty;

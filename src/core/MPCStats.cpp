@@ -254,7 +254,7 @@ CMPCStats* CMPCStats::GetMPCStats(char evalType,char aCoeffSet, int aPrune) {
     		case 'A':	hMaxMPC=25; break;
     		}
     	}
-    	os << "coefficients/mpc" << evalType << aCoeffSet << "_" << hMaxMPC << ".txt";
+    	os << fnBaseDir << "coefficients/mpc" << evalType << aCoeffSet << "_" << hMaxMPC << ".txt";
     	try {
     		mpcs=new CMPCStats(os.str().c_str(), aPrune);
     	}

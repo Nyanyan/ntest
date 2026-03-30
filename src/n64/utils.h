@@ -329,5 +329,6 @@ inline int Square(int row, int col) {
 
 // directory where the program is located
 extern std::string fnBaseDir;
+void SetCurrentDirectoryToBaseDir();
 
 #endif // defined(_H_UTILS)

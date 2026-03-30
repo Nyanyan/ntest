@@ -981,8 +981,8 @@ void CreateForcedOpeningList(const char* fn, bool fMyColor) {
 }
 
 void InitForcedOpenings() {
-	CreateForcedOpeningList("black.ggf", true);
-	CreateForcedOpeningList("white.ggf", false);
+	CreateForcedOpeningList((fnBaseDir+"black.ggf").c_str(), true);
+	CreateForcedOpeningList((fnBaseDir+"white.ggf").c_str(), false);
 	std::cerr << "Map Size: Black: " << foms[1].size() << ", White: " << foms[0].size() << "\n";
 }
 
