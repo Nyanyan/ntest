@@ -575,8 +575,9 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     nGames=1;
     int argBase=1;
     bool fEdaxLevel=false;
+    bool fGtpModeRequested=false;
 
-    while (argc>argBase && argv[argBase][0]=='-' && strcmp(argv[argBase], "--gtp")) {
+    while (argc>argBase && argv[argBase][0]=='-') {
     	if (!strcmp(argv[argBase], "-l")) {
     		if (argc<=argBase+1) {
     			cerr << "The -l option requires a positive level.\n";
@@ -612,9 +613,17 @@ TMode ParseCommandLine(int argc, char* argv[], const char*& submode,
     		}
     		argBase+=2;
     	}
+    	else if (!strcmp(argv[argBase], "--gtp")) {
+    		fGtpModeRequested=true;
+    		argBase++;
+    	}
     	else {
     		break;
     	}
+    }
+
+    if (fGtpModeRequested) {
+    	return kGTP;
     }
 
     // overrides by command line
